@@ -1,0 +1,106 @@
+	header{
+		height: 50px;
+		background-color: blue;
+	}
+	.mainbody{
+		height: 650px;
+		width: 100%;
+		margin: 5px 0;
+	}
+	.control-table{
+		height: 200px;
+		width: 300px;
+		border: 1px solid black;
+		margin: 5px auto;
+	}
+	.btn-group{
+		border: 1px solid black;
+	}
+	.base-group{
+		border: 1px solid black;
+	}
+	.bet-base{
+		border-radius: 100%;
+		border: 1px solid black;
+		width: 40px;
+		height: 40px;
+	}
+	#bankerTable, #playerTable{
+		min-height: 400px;
+		width: 45%;
+		border: 1px solid black;
+	}
+	.left{
+		float: left;
+	}
+	.right{
+		float: right;
+	}
+	.info-box{
+		height: 150px;
+		width: 35%;
+		max-width: 300px;
+		border: 1px solid black;
+		margin-top: -160px;
+	}
+	.card-box{
+		min-height: 400px;
+		width: 80%;
+		margin: 10px auto;
+		border: 1px solid black;
+	}
+	/* 扑克牌 */
+	.card{
+		height: 148px;
+		width: 98px;
+		border: 1px solid gray;
+		margin: 5px;
+		position: relative;
+		display: inline-block;
+	}
+	.card-tag-top-left{
+		position: absolute;
+		left: 5px;
+		top: 5px;
+	}
+	.card-tag-bottom-right{
+		position: absolute;
+		right: 5px;
+		bottom: 5px;
+	}
+	.card-tag-top-right{
+		position: absolute;
+		top: 5px;
+		right: 5px;		
+		width: 20px;
+		height: 20px;
+	}
+	.card-tag-bottom-left{
+		position: absolute;
+		bottom: 5px;
+		left: 5px;
+		width: 20px;
+		height: 20px;
+	}
+	.card-tag-center{
+		position: absolute;
+		top: 60px;
+		left: 35px;
+		width: 30px;
+		height: 30px;
+	}
+	.card-back{
+		height: 150px;
+		width: 100px;
+		margin: 5px;
+		display: none;
+		background-image: url('../img/cardback.png');
+
+	}
+	/* 扑克牌 END */
+
+	footer{
+		height: 50px;
+		background-color: black;
+		background-size: 
+	}
