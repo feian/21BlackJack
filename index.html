@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>21点</title>
+	<link rel="stylesheet" type="text/css" href="css/mystyle.css">
+	<style type="text/css">
+	</style>
+</head>
+<body>
+	<header>
+	</header>
+	<div class="mainbody" >
+		<div>
+			<div class="control-table">
+				<div class="btn-group">
+					<!-- <div>
+						<span id="statusSpan" ></span>
+					</div> -->
+					<button id="betOn" >玩家下注</button>
+					<button id="dealBtn" >庄家发牌</button>
+					<button id="playerAskBtn" >玩家要牌</button>
+					<button id="playerStopBtn" >停止要牌</button>
+					<button id="bankerAskBtn" >庄家要牌</button>
+					<button id="bankerStopBtn" >停止要牌</button>
+					<button id="roundEndBtn" >局末清算</button>
+				</div>
+				<div class="base-group">
+					<button class="bet-base" value="5" >5<br/>倍</button>
+					<button class="bet-base" value="10" >10倍</button>
+					<button class="bet-base" value="20" >20倍</button>
+					<button class="bet-base" value="50" >50倍</button>				
+				</div>
+			</div>
+		</div>
+
+		<div id="bankerTable" class="left">
+			<div class="info-box left" >分数:500</div>
+			<div class="card-box" >
+				<!-- <div class="card">
+					<span class="card-tag-top-left">A</span>
+					<span class="card-tag-bottom-right">A</span>
+					<img class="card-tag-top-right" src="img/heart.png"/>
+					<img class="card-tag-bottom-left" src="img/heart.png"/>
+					<img class="card-tag-center" src="img/heart.png"/>
+				</div> -->
+				<div class="card-back" ></div>
+			</div>
+		</div>
+		<div id="playerTable" class="right">
+			<div  class="info-box right" >分数:500</div>
+			<div class="card-box" >
+				<div class="card-back" ></div>
+			</div>
+		</div>
+	</div>
+	<footer>谭菲制作</footer>
+
+	<script src="js/myjs.js"></script>
+</body>
+</html>
