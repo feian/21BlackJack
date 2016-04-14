@@ -6,7 +6,8 @@
 			Player: function (table){
 				this.table = table;
 				this.cardback = table.querySelector(".card-back");
-				this.infoBox = table.querySelector(".info-box");
+				//this.infoBox = table.querySelector(".info-box");
+				this.moneySpan = table.querySelector('.info-box .money');
 				this.cardBox = table.querySelector(".card-box");
 				this.cardGroup = [];
 				var money = 1000;
@@ -14,15 +15,16 @@
 					return money;
 				};
 				this.setMoney = function(value){
-					money = value;
+					money += parseInt(value);
 				};
 				
 			},
 			//庄家类
-			Banker: function (table){
+			/*Banker: function (table){
 				this.table = table;
 				this.cardback = table.querySelector(".card-back");
-				this.infoBox = table.querySelector(".info-box");
+				//this.infoBox = table.querySelector(".info-box");
+				this.moneySpan = table.querySelector('.info-box .money');
 				this.cardBox = table.querySelector(".card-box");
 				this.cardGroup = [];
 				var money = 1000;
@@ -30,9 +32,9 @@
 					return money;
 				};
 				this.setMoney = function(value){
-					money = value;
+					money += parseInt(value);
 				};
-			},
+			},*/
 			//一副牌
 			Cards: function (){
 				var i,
@@ -106,21 +108,15 @@
 
 			},
 			//赌注
-			Bet: {
-				base: 1,
-				times: 1,
-				insurance: false,
-				moneyPool: 0,
-				loser: undefined
-				//owner: undefined
+			Bet: function(){
+				this.base = 1;
+				this.times = 1;
+				this.insurance = 0;
+				this.bankerMoney = 0;
+				this.playerMoney = 0;
+				//this.moneyPool = 0;
+				this.loser = undefined;
 			}
-			//游戏状态
-			/*Status: {
-				bankerDeal: '庄家发牌',
-				playerAsk: '玩家要牌',
-				playerStop: '停止要牌'
-
-			}*/
 		};
 
 	})();
@@ -132,12 +128,12 @@
 			addCard: function (){
 				
 				cardData = cards.getCard();
-				console.log(cardData);
-				if(cardData == undefined){
-					console.log("新发一副牌");
-					cards = new Cards();
+
+				if(cardData == undefined){         //新发一副牌
+					cards = new ModelModule.Cards();
 					cardData = cards.getCard();
 				}
+
 
 				var card = document.createElement('div');
 				card.setAttribute('class','card');
@@ -172,6 +168,11 @@
 					content: cardData.content
 				}
 			},
+			//翻牌
+			turnOver: function (front,back){
+				front.style.display = 'none';
+				back.style.display = 'inline-block';
+			},
 			//清除某人的一组牌
 			removeCard: function(xer){
 				var cardBox = xer.cardBox,
@@ -181,18 +182,46 @@
 				}
 				xer.cardback.style.display = 'none';
 			},
-			//设置游戏状态
-			setStatus: function(btngroup){
-				betOn.style.display = 'none';
-				dealBtn.style.display = 'none';
-				playerAskBtn.style.display = 'none';
-				bankerAskBtn.style.display = 'none';
-				roundEndBtn.style.display = 'none';
-				playerStopBtn.style.display = 'none';
-				bankerStopBtn.style.display = 'none';
+			//重置游戏提示信息
+			resetInfo: function(){
+				resultPanel.style.display = 'none';
+				infoSpans.baseSpan.style.display = 'none';
+				infoSpans.insuranceSpan.style.display = 'none';
+				infoSpans.tieSpan.style.display = 'none';
+				infoSpans.burstSpan.style.display = 'none';
+				infoSpans.winnerSpan.style.display = 'none';
 
-				//statusSpan.innerText = text;
-				btngroup.forEach(function(item){
+				infoSpans.baseSpan.innerText = '';
+				infoSpans.insuranceSpan.innerText = '';
+				infoSpans.bankerGotSpan.innerText = '';
+				infoSpans.playerGotSpan.innerText = '';
+				infoSpans.winnerSpan.innerText = '';
+
+				var baseBtns = baseGroup.querySelectorAll('button'),
+					i,len = baseBtns.length;
+				for(i=0; i<len; i++){
+					baseBtns[i].style.display = 'inline';
+				}
+			},
+			//设置游戏按钮出现状态
+			setBtnStatus: function(btnArr){
+				/*Object.keys(btnGroup).forEach(function(item){
+					item.style.display = 'none';
+				});*/
+				infoSpans.insuranceSpan.style.display = 'none';
+				baseGroup.style.display = 'none';
+
+				btnGroup.roundBeginBtn.style.display = 'none';
+				btnGroup.dealBtn.style.display = 'none';
+				btnGroup.giveUpInsurance.style.display = 'none';
+				btnGroup.buyInsurance.style.display = 'none';
+				btnGroup.playerAskBtn.style.display = 'none';
+				btnGroup.bankerAskBtn.style.display = 'none';
+				btnGroup.playerStopBtn.style.display = 'none';
+				btnGroup.bankerStopBtn.style.display = 'none';
+				//btnGroup.roundEndBtn.style.display = 'none';
+
+				btnArr.forEach(function(item){
 					item.style.display = 'inline';
 				});
 				
@@ -208,11 +237,11 @@
 			xer.cardGroup.push(newCard);
 			xer.cardBox.appendChild(newCard.elem);
 		};
-		//判断是否黑杰克
+		//判断是否黑杰克：A+10点牌
 		var isBlackJack = function(cardGroup){
 			if(cardGroup.length==2){
-				if((cardGroup[0].content.text == 'A' && cardGroup[1].content.text =='10')
-					||(cardGroup[0].content.text == '10' && cardGroup[1].content.text =='A')){
+				if((cardGroup[0].content.text == 'A' && cardGroup[1].content.value =='10')
+					||(cardGroup[0].content.value == '10' && cardGroup[1].content.text =='A')){
 					return true;
 				}
 			}
@@ -253,23 +282,51 @@
 		};
 
 		return {
-			//翻牌
-			turnOver: function (front,back){
-				front.style.display = 'none';
-				back.style.display = 'inline-block';
+			//开局
+			roundBegin: function(){
+				ViewMudule.removeCard(banker);      //清除桌面上的牌
+				ViewMudule.removeCard(player);
+				ViewMudule.resetInfo();              //重设提示信息
+				ViewMudule.setBtnStatus([baseGroup]);
+
+				bet = new ModelModule.Bet();
+				//设置可用倍数
+				var baseBtns = baseGroup.querySelectorAll('button'), 
+					i,len = baseBtns.length,
+					min = Math.min(banker.getMoney(),player.getMoney());
+				for(i=0; i<len; i++){
+					if(min<baseBtns[i].value){
+						baseBtns[i].style.display = 'none';
+					}
+				}
+				if(min<10){
+					alert('请充值!');
+				}
+			},
+			//下注
+			betOn: function(base){
+
+				bet.base = base;
+				bet.bankerMoney = bet.base;
+				bet.playerMoney = bet.base;
+
+				infoSpans.baseSpan.innerText = "赌金："+ bet.base + "倍";
+				infoSpans.baseSpan.style.display = "inline";
+
+				ViewMudule.setBtnStatus([btnGroup.dealBtn]);
 			},
 			//发牌 每人2张
 			deal: function (){ 
-
-				ViewMudule.removeCard(banker);   //清除桌面上的牌
-				ViewMudule.removeCard(player);
 
 				dealOne(banker);
 				dealOne(banker);
 				banker.cardback.style.display = 'inline-block'; //第一张牌暗牌处理
 				banker.cardGroup[0].elem.style.display = 'none';
 				banker.cardGroup[0].elem.onclick = function(){
-					ControlMudule.turnOver(this,banker.cardback);
+					ViewMudule.turnOver(this,banker.cardback);
+				};
+				banker.cardback.onclick = function(){
+					ViewMudule.turnOver(this,banker.cardGroup[0].elem);
 				};
 
 				dealOne(player);
@@ -277,14 +334,72 @@
 				player.cardback.style.display = 'inline-block'; //第一张牌暗牌处理
 				player.cardGroup[0].elem.style.display = 'none';
 				player.cardGroup[0].elem.onclick = function(){
-					ControlMudule.turnOver(this,player.cardback);
+					ViewMudule.turnOver(this,player.cardback);
+				};
+				player.cardback.onclick = function(){
+					ViewMudule.turnOver(this,player.cardGroup[0].elem);
 				};
 
-				if(isBlackJack(player.cardGroup)){
-					alert("BlackJack!");
-					// 其他操作 买保险等
-					ModelModule.Bet.insurance = true;
-					//ModelModule.Bet.moneyPool += 
+				//测试保险
+				/*banker.cardGroup[1].content.text = 'A';
+				banker.cardGroup[1].content.value = 1;
+				player.cardGroup[1].content.text = 'A';
+				player.cardGroup[0].content.text = '10';
+				player.cardGroup[0].content.value = 10;*/
+				//end
+
+				//庄家明牌是A时，玩家可选择买保险
+				if(banker.cardGroup[1].content.text == 'A'    
+					&& player.getMoney()>=bet.playerMoney/2){
+					ViewMudule.setBtnStatus([btnGroup.buyInsurance,
+						btnGroup.playerAskBtn,btnGroup.playerStopBtn]);
+				} else {
+					ViewMudule.setBtnStatus([btnGroup.playerAskBtn,btnGroup.playerStopBtn]);
+				}
+				//玩家有黑杰克
+				if(isBlackJack(player.cardGroup)){ 
+
+					alert("哈哈！黑杰克!");   
+
+					if(isBlackJack(banker.cardGroup)){  //都是黑杰克
+
+						if(banker.cardGroup[1].content.text == 'A'    
+							&& player.getMoney()>=bet.playerMoney/2){  //是否买保险，不能再要牌
+							ViewMudule.setBtnStatus([btnGroup.buyInsurance,btnGroup.giveUpInsurance]);
+
+						} else{                           
+							bet.loser = undefined;      //没买保险就平局
+							ControlMudule.roundEnd();
+						}
+						
+					} else {                            //庄没有黑杰克玩家赢2倍
+						bet.loser = banker;
+						
+						ControlMudule.roundEnd();
+					}
+				}
+				
+			},
+			//买保险
+			buyInsurance: function(){
+				bet.insurance = bet.playerMoney/2;
+				player.moneySpan.innerText = player.getMoney();
+				//开保险
+				infoSpans.insuranceSpan.style.display = 'inline';
+				if(isBlackJack(banker.cardGroup)){  //庄有黑杰克，庄输亮牌，玩家不出保险金
+					infoSpans.insuranceSpan.innerText = '保险买对！';
+					bet.loser = banker;
+					ControlMudule.roundEnd();
+				} else{                            //庄没有黑杰克，继续游戏，玩家输掉保险金
+					infoSpans.insuranceSpan.innerText = '保险买错！';
+					player.setMoney(-1*bet.insurance); 
+					banker.setMoney(+1*bet.insurance);
+
+					banker.moneySpan.innerText = banker.getMoney();  //显示剩余赌金
+					player.moneySpan.innerText = player.getMoney();
+
+					ViewMudule.setBtnStatus([btnGroup.playerAskBtn,
+						btnGroup.playerStopBtn,infoSpans.insuranceSpan]);
 				}
 			},
 			//要牌
@@ -292,36 +407,67 @@
 				dealOne(xer);
 				var score = calculator(xer.cardGroup);
 				if(score>21){
-					console.log("爆掉了!");
-					//结算 xer输了
-					ModelModule.Bet.loser = xer;
+					//alert("爆掉了!");
+					infoSpans.burstSpan.style.display = 'inline';
+					bet.loser = xer;
+					ControlMudule.roundEnd();
 				}
-
-
 			},
 			//局末清算
 			roundEnd: function(){
 
-				if(ModelModule.Bet.loser == undefined){   //如果没人爆掉，算点数论输赢
+				player.cardback.click();                //亮牌
+				banker.cardback.click();
+
+				if(bet.loser == undefined){             //如果没人爆掉，算点数论输赢
 					var bankerScore = calculator(banker.cardGroup);
 					var playerScore = calculator(player.cardGroup);
 					if(bankerScore > playerScore){
-						ModelModule.Bet.loser = player;   //庄家赢了
+						bet.loser = player;  
 					}else if(bankerScore < playerScore){
-						ModelModule.Bet.loser = banker;   //玩家赢了
+						bet.loser = banker; 
 					} 
 				}
+				//结算赌金
+				if(bet.loser == undefined){             //平局
+					infoSpans.tieSpan.style.display = 'inline';
+					infoSpans.winnerSpan.style.display = 'none';
 
-				if(ModelModule.Bet.loser == banker){     //分配赌注金
-
-				}else if(ModelModule.Bet.loser == player){
-
-				}else if(ModelModule.Bet.loser == undefined){
+					//显示赌金情况
+					infoSpans.bankerGotSpan.innerText = 0; 
+					infoSpans.playerGotSpan.innerText = 0;
 
 				}else{
-					console.log('出现错误：loser未指定！');
-				}
+					//显示输赢结果
+					infoSpans.tieSpan.style.display = 'none';
+					infoSpans.winnerSpan.style.display = 'inline';
+					
+					if(bet.loser == player){              //庄家赢了
+						infoSpans.winnerSpan.innerText = '庄家赢！'; 
+						banker.setMoney(+1*bet.base*bet.times);
+						player.setMoney(-1*bet.base*bet.times);    
+						
+						infoSpans.bankerGotSpan.innerText = '+' + bet.bankerMoney; 
+						infoSpans.playerGotSpan.innerText = '-' + bet.playerMoney; 
 
+					}else if(bet.loser == banker){        //玩家赢了
+						infoSpans.winnerSpan.innerText = '玩家赢！';
+						banker.setMoney(-1*bet.base*bet.times);
+						player.setMoney(+1*bet.base)*bet.times;
+
+						infoSpans.bankerGotSpan.innerText = '-' + bet.bankerMoney;
+						infoSpans.playerGotSpan.innerText = '+' + bet.playerMoney;
+
+					}else{
+						console.log('出现错误：loser未指定！');
+					}
+				} 
+
+				banker.moneySpan.innerText = banker.getMoney();  //显示剩余赌金
+				player.moneySpan.innerText = player.getMoney();
+				resultPanel.style.display = 'block';
+
+				ViewMudule.setBtnStatus([btnGroup.roundBeginBtn]);
 			}
 			
 		};
@@ -330,72 +476,130 @@
 
 
 	//全局变量
-	var betOn = document.querySelector('#betOn');
-	var dealBtn = document.querySelector('#dealBtn');
-	var playerAskBtn = document.querySelector('#playerAskBtn');
-	var playerStopBtn = document.querySelector('#playerStopBtn');
-	var bankerStopBtn = document.querySelector('#bankerStopBtn');
-	var bankerAskBtn = document.querySelector('#bankerAskBtn');
-	var roundEndBtn = document.querySelector('#roundEndBtn');
-	var statusSpan = document.querySelector('#statusSpan'); 
+	var resultPanel = document.querySelector('.result-panel');
+	var baseGroup = document.querySelector('.base-group');
+
+	var infoSpans = {
+		baseSpan : document.querySelector('#baseSpan'),
+		insuranceSpan: document.querySelector('#insuranceSpan'),
+		bankerGotSpan : document.querySelector('#bankerGotSpan'),
+		playerGotSpan : document.querySelector('#playerGotSpan'),
+		winnerSpan : document.querySelector('#winnerSpan'),
+		tieSpan : document.querySelector('#tieSpan'),
+		burstSpan : document.querySelector('#burstSpan')
+	};
+
+	var btnGroup = {
+		roundBeginBtn : document.querySelector('#roundBeginBtn'),
+		dealBtn : document.querySelector('#dealBtn'),
+		buyInsurance : document.querySelector('#buyInsurance'),
+		giveUpInsurance : document.querySelector('#giveUpInsurance'),
+		playerAskBtn : document.querySelector('#playerAskBtn'),
+		playerStopBtn : document.querySelector('#playerStopBtn'),
+		bankerStopBtn : document.querySelector('#bankerStopBtn'),
+		bankerAskBtn : document.querySelector('#bankerAskBtn'),
+		//roundEndBtn : document.querySelector('#roundEndBtn')
+	};
 
 	var cards = new ModelModule.Cards();
+	var bet ; //= new ModelModule.Bet();
 	var player = new ModelModule.Player(document.querySelector('#playerTable'));
-	var banker = new ModelModule.Banker(document.querySelector('#bankerTable'));
+	var banker = new ModelModule.Player(document.querySelector('#bankerTable'));
 
-	
+	var music = document.querySelector('audio');  //音效
+		
 
 	//自动初始化
 	(function init(){
-		//事件注册
-		player.cardback.onclick = function(){
-			ControlMudule.turnOver(this,player.cardGroup[0].elem);
-		};
-		banker.cardback.onclick = function(){
-			ControlMudule.turnOver(this,banker.cardGroup[0].elem);
-		};
 
-		//双方下注
-		betOn.onclick = function(){
-			
-			ViewMudule.setStatus([dealBtn]);
-		};
-
-		//发牌
-		dealBtn.onclick = function(){
-			ControlMudule.deal();
-			//ControlMudule.setStatus(ModelModule.Status.playerAsk,[playerAskBtn,playerStopBtn]);
-			ViewMudule.setStatus([playerAskBtn,playerStopBtn]);
+		//信息设置
+		player.moneySpan.innerText = player.getMoney();
+		banker.moneySpan.innerText = player.getMoney();
+		
+		//开局
+		btnGroup.roundBeginBtn.onclick = function(){
+			ControlMudule.roundBegin();
 		};
 		
-		//玩家要牌
-		playerAskBtn.onclick = function(){
-			ControlMudule.ask(player);
+		//玩家下注
+		baseGroup.onclick = function(e){        //委托处理下注
+			e = e || window.event;
+			var tagE = e.target || e.srcElement;  
+			if(tagE.tagName.toLowerCase()=='button'){
+				ControlMudule.betOn(tagE.value);
+			}
+		};	
+
+		//发牌
+		btnGroup.dealBtn.onclick = function(){
+			ControlMudule.deal();
 		};
+		
+		//买保险
+		btnGroup.buyInsurance.onclick = function(){
+			ControlMudule.buyInsurance();
+		};
+
+		//放弃买保险
+		btnGroup.giveUpInsurance.onclick = function(){ 
+			ControlMudule.roundEnd();
+		};
+
+		//玩家要牌
+		btnGroup.playerAskBtn.onclick = function(){
+			ControlMudule.ask(player);
+			btnGroup.buyInsurance.style.display = 'none';
+		};
+
+
+		//玩家停止要牌
+		btnGroup.playerStopBtn.onclick =  function(){
+			banker.cardback.click();   //庄家亮牌
+			ViewMudule.setBtnStatus([bankerAskBtn,bankerStopBtn]);
+			//去掉注册事件
+		};
+
 		//庄家要牌
-		bankerAskBtn.onclick = function(){
+		btnGroup.bankerAskBtn.onclick = function(){
 			ControlMudule.ask(banker);
 
 		};
-		//玩家停止要牌
-		playerStopBtn.onclick =  function(){
-			//ControlMudule.setStatus(ModelModule.Status.playerStop,[bankerAskBtn,bankerStopBtn]);
-			ViewMudule.setStatus([bankerAskBtn,bankerStopBtn]);
-			banker.cardback.click();   //庄家亮牌
-			//去掉注册事件
-		};
+
 		//庄家停止要牌
-		bankerStopBtn.onclick =  function(){
-			//ControlMudule.setStatus(ModelModule.Status.playerStop,[roundEndBtn]);
-			ViewMudule.setStatus([roundEndBtn]);
-		};
-		//局末清算
-		roundEndBtn.onclick = function(){
+		btnGroup.bankerStopBtn.onclick =  function(){
 			ControlMudule.roundEnd();
-			ViewMudule.setStatus([dealBtn]);
+			//ViewMudule.setBtnStatus([roundEndBtn]);
 		};
 
+		//局末清算
+		/*btnGroup.roundEndBtn.onclick = function(){			
+			ControlMudule.roundEnd();
+		};*/
+
 		//设置游戏初始状态
-		//ControlMudule.setStatus(ModelModule.Status.bankerDeal,[dealBtn]);
-		ViewMudule.setStatus([betOn]);
+		ViewMudule.setBtnStatus([roundBeginBtn]);
+
+		//声音
+		document.querySelector('.sound').onclick = function(){
+			if(music.paused){
+				music.play();
+				this.innerText = '静音';
+			} else{
+				music.pause();
+				this.innerText = '声音';
+			}
+		};
+
+		//充值
+		document.querySelector('.recharge').onclick = function(){
+			alert("Sorry!充值功能有待完善。")
+		};
+
+		//游戏规则说明
+		document.querySelector('.rules').onclick = function(){
+			alert("Sorry!规则说明功能有待完善。")
+		};
+
+		music.play();
+
 	})();
