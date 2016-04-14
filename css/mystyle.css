@@ -1,34 +1,102 @@
+	body{
+		margin: 0;
+		padding: 0;
+		-webkit-user-select: none;  /* Chrome all / Safari all /opera15+*/  
+		-moz-user-select: none;     /* Firefox all */  
+		-ms-user-select: none;      /* IE 10+ */  
+		user-select: none;  
+	}
 	header{
-		height: 50px;
-		background-color: blue;
+		height: 70px;
+		background-image: url('../img/banner.png');
+		background-repeat: no-repeat;
+		background-size:100% 100%;
+		overflow: hidden;
+		position: relative;
+	}
+	.title{
+		margin-left: 10%;
+		font-size:40px;
+		font-weight: bold;
+		font-style: oblique;
+		color: white;
+		top: 10px;
+	}
+	header span{
+		font-size:18px;
+		font-weight: bold;
+		color: #218868;
+		position: absolute;
+		cursor: pointer;
+		top: 28px;
+	}
+	.sound{
+		right: 130px;
+	}
+	.rules{
+		right: 50px;
+	}
+	.recharge{
+		right: 10px;
 	}
 	.mainbody{
-		height: 650px;
+		height: 600px;
 		width: 100%;
-		margin: 5px 0;
+		margin: 0 2px;
+		padding-top: 5px;
+		background-image: url('../img/desk.jpg');
+		background-repeat: no-repeat;
+		background-size:100% 100%;
 	}
+	/* 高180px */
 	.control-table{
-		height: 200px;
+		height: 165px;
+		padding-top: 15px;
 		width: 300px;
-		border: 1px solid black;
-		margin: 5px auto;
+		margin: 0px auto;
+		text-align: center;
+		background-image: url('../img/controltable.png');
+		background-size:100% 100%;
+		border-radius: 3px;
+		opacity: 20%;
+	}
+	#burstSpan, #baseSpan, #insuranceSpan, .result-panel{
+		display: none;
+		font-weight: bold;
+	  	font-size: 18px;
+	  	color: #218868;
 	}
 	.btn-group{
-		border: 1px solid black;
+		/*border: 1px solid black;*/
+	}
+	/* control btn*/
+	button {
+		border: none;
+		border-radius: 35px;
+		width: 82px;
+		height: 46px;
+	  	background-image: url('../img/btn.png');
+	  	background-position:center;
+	  	font-weight: bold;
+	  	font-size: 14px;
+	  	color: gray;
+	  	cursor: pointer;
 	}
 	.base-group{
-		border: 1px solid black;
+		/*border: 1px solid black;*/
 	}
 	.bet-base{
 		border-radius: 100%;
-		border: 1px solid black;
-		width: 40px;
-		height: 40px;
+		background-image: url('../img/base.png');
+		background-size:100% 100%;
+		width: 60px;
+		height: 60px;
+		color: red;
 	}
 	#bankerTable, #playerTable{
 		min-height: 400px;
 		width: 45%;
-		border: 1px solid black;
+		/*border: 1px solid black;*/
 	}
 	.left{
 		float: left;
@@ -38,23 +106,31 @@
 	}
 	.info-box{
 		height: 150px;
-		width: 35%;
-		max-width: 300px;
+		width: 120px;
 		border: 1px solid black;
 		margin-top: -160px;
+		color: orange;
+	}
+	.headimg{
+		width: 120px;
+		height: 135px;
+		display: block;
 	}
 	.card-box{
-		min-height: 400px;
+		height: 380px;
+		overflow: auto;
 		width: 80%;
 		margin: 10px auto;
-		border: 1px solid black;
+		border: 1px dotted gray;
 	}
 	/* 扑克牌 */
 	.card{
 		height: 148px;
 		width: 98px;
 		border: 1px solid gray;
+		border-radius: 3px;
 		margin: 5px;
+		background-color: white;
 		position: relative;
 		display: inline-block;
 	}
@@ -94,13 +170,16 @@
 		width: 100px;
 		margin: 5px;
 		display: none;
+		border-radius: 3px;
 		background-image: url('../img/cardback.png');
 
 	}
 	/* 扑克牌 END */
 
 	footer{
-		height: 50px;
+		height: 40px;
 		background-color: black;
-		background-size: 
+		text-align: center;
+		padding-top: 10px;
+		color: gray;
 	}
